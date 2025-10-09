@@ -6,7 +6,7 @@ _has() { command -v "$1" >/dev/null 2>&1; }
 alias g='git'
 alias gs='git status -sb'
 alias ga='git add'
-alias gc='git commit -m'
+alias gc='git commit'
 alias gca='git commit -a -m'
 alias gp='git push'
 alias gl='git log --oneline --graph --decorate --all'
@@ -24,6 +24,13 @@ _has terraform && {
   alias tfa='terraform apply'
   alias tfd='terraform destroy'
   alias tfs='terraform state list'
+  alias tft='terraform test'
+}
+
+# --- Terraform-Docs ---
+_has terraform-docs && {
+  alias tfdocs='terraform-docs markdown table --output-file README.md --output-mode inject .'
+  alias tfdocs-module='terraform-docs markdown table --output-file README.md --output-mode inject . --lockfile=false'
 }
 
 # --- Docker / Compose ---
