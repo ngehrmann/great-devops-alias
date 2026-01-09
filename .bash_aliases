@@ -2,6 +2,10 @@
 # Helper: check if a command exists (used to avoid broken aliases)
 _has() { command -v "$1" >/dev/null 2>&1; }
 
+# Custom
+alias tfdocs='terraform-docs markdown table --output-file README.md --output-mode inject .'
+alias tfdocs-m='terraform-docs markdown table --output-file README.md --output-mode inject . --lockfile=false'
+
 # --- Git ---
 alias g='git'
 alias gs='git status -sb'
@@ -13,6 +17,8 @@ alias gl='git log --oneline --graph --decorate --all'
 alias gd='git diff'
 alias gco='git checkout'
 alias gb='git branch -vv'
+alias gcm="git commit -malias"
+alias gcm="git commit -m"
 
 # --- Terraform ---
 _has terraform && {
@@ -25,12 +31,6 @@ _has terraform && {
   alias tfd='terraform destroy'
   alias tfs='terraform state list'
   alias tft='terraform test'
-}
-
-# --- Terraform-Docs ---
-_has terraform-docs && {
-  alias tfdocs='terraform-docs markdown table --output-file README.md --output-mode inject .'
-  alias tfdocs-module='terraform-docs markdown table --output-file README.md --output-mode inject . --lockfile=false'
 }
 
 # --- Docker / Compose ---
@@ -79,7 +79,7 @@ _has kubectl && {
     [ -n "$pod" ] && kubectl logs -f -n "$ns" --tail=200 "$pod" || echo "Pod mit Präfix '$1' nicht gefunden (Namespace: $ns)"
   }
 }
-_has kubectx && alias kctx='kubectx'
+#_has kubectx && alias kctx='kubectx'
 _has kubens && alias kns='kubens'
 _has k9s && alias k9='k9s'
 
@@ -101,6 +101,17 @@ _has az && {
   aksctx() { az aks get-credentials -g "$1" -n "$2" --overwrite-existing; }
 }
 
+# --- Terragrunt ---
+_has terragrunt && {
+   alias tg='terragrunt'
+}
+
+# --- Kubectx ---
+#_has kubectx && {
+#alias kx="kubectx"
+#}
+
+
 # --- General QoL ---
 alias please='sudo $(fc -ln -1)'
 alias ..='cd ..'
@@ -108,7 +119,27 @@ alias ...='cd ../..'
 alias ll='ls -la'
 alias la='ls -A'
 alias l='ls -CF'
+alias cls='clear'
 
 # Reload shell config quickly
 alias src='source ~/.bashrc && echo "reloaded ~/.bashrc"'
+
+# Script for delete all Git Branches other than Main
+git_prune_to_main() {
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Not inside a git repository."
+    return 1
+  fi
+
+  git stash push -u -m "auto-prune-$(date +%s)" || return 1
+  git checkout main || return 1
+  git pull || return 1
+  git branch --format '%(refname:short)' \
+    | grep -v '^main$' \
+    | xargs -r git branch -D
+}
+
+alias gptm='git_prune_to_main'
+
+# ---- end ----
 # ---- end ----
